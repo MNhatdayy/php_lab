@@ -1,0 +1,14 @@
+.shop--category {
+	&--wrapper {
+		height: 100vh;
+		padding: 24px;
+	}
+
+	&__list-product {
+		margin-top: 48px;
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 24px;
+		box-sizing: border-box;
+	}
+}
