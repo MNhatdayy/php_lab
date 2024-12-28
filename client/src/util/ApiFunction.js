@@ -1,6 +1,6 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost/php/Php-lab/api";
+axios.defaults.baseURL = "http://localhost/php/php_lab/api";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 export const getAuthToken = () => {

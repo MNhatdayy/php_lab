@@ -3,12 +3,11 @@ class SessionHelper
 {
     public static function isLoggedIn()
     {
-        return isset($_SESSION['username']);
+        return isset($_SESSION['name']);
     }
     public static function isAdmin()
     {
         return isset($_SESSION['role_id']) && strtolower($_SESSION['role_id']) === '1';
-        
     }
     // public static function isAdmin() {
     //     return isset($_SESSION['roles']) && in_array('1', $_SESSION['roles']);
@@ -16,7 +15,7 @@ class SessionHelper
     // public static function hasRole($role) {
     //     return isset($_SESSION['roles']) && in_array(strtolower($role), $_SESSION['roles']);
     // }
-    
+
     public static function requireRole($role)
     {
         if (!isset($_SESSION['role']) || strtolower($_SESSION['role']) !== strtolower($role)) {
