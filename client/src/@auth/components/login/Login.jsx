@@ -21,7 +21,8 @@ const Login = () => {
 	};
 	const navigate = useNavigate();
 	const loginFunction = async (values) => {
-		login(values.username, values.password)
+		console.log(values);
+		login(values.email, values.password)
 			.then((value) => {
 				if (value !== null) {
 					success();
@@ -55,12 +56,12 @@ const Login = () => {
 				autoComplete="off"
 				onFinish={loginFunction}>
 				<Form.Item
-					label="Username"
-					name="username"
+					label="Email"
+					name="email"
 					rules={[
 						{
 							required: true,
-							message: "Please input your username!",
+							message: "Please input your email!",
 						},
 					]}>
 					<Input />

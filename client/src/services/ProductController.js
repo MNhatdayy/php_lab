@@ -3,7 +3,9 @@ import { notification } from "antd";
 
 export const fetchProducts = async (setProducts) => {
   try {
-    const response = await axios.get("http://localhost:8099/api/products");
+    const response = await axios.get(
+      "http://localhost:82/php_lab/api/products"
+    );
     setProducts(response.data);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -11,7 +13,7 @@ export const fetchProducts = async (setProducts) => {
 };
 export const deleteProduct = async (id, setProducts, products) => {
   try {
-    await axios.delete(`http://localhost:8099/api/products/${id}`);
+    await axios.delete(`http://localhost:82/php_lab/api/products/${id}`);
     setProducts(products.filter((product) => product.id !== id));
     notification.success({
       message: "Delete Success",
@@ -25,20 +27,25 @@ export const deleteProduct = async (id, setProducts, products) => {
     });
   }
 };
-export const fetchProductDetails = async (id, form, setImageUrl) => {
+export const fetchProductDetails = async (
+  id,
+  form,
+  setImageUrl,
+  setCategories
+) => {
   try {
     const response = await axios.get(
-      `http://localhost:8099/api/products/${id}`
+      `http://localhost:82/php_lab/api/products/${id}`
     );
     const product = response.data;
-    form.setFieldsValue({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      quantity: product.quantity,
-      categoryId: product.category.id,
-    });
+    form.setFieldsValue(response.data, { categoryId: product.categoryId });
     setImageUrl(product.imageUrl);
+    if (!setCategories || setCategories.length === 0) {
+      const categoriesResponse = await axios.get(
+        "http://localhost:82/php_lab/api/categories"
+      );
+      setCategories(categoriesResponse.data); // Set categories if needed
+    }
     // Set more images if necessary
   } catch (error) {
     console.error("Error fetching product details:", error);
@@ -47,40 +54,30 @@ export const fetchProductDetails = async (id, form, setImageUrl) => {
 export const createProduct = async (
   values,
   imageUrl,
-  moreImages,
   navigate,
   form,
   setImageUrl,
-  setMoreImages,
   message,
   categories
 ) => {
   try {
-    const { categoryId, ...restValues } = values;
-    const selectedCategory = categories.find(
-      (category) => category.id === categoryId
-    );
-    const product = {
-      ...restValues,
-      category: {
-        id: categoryId,
-        name: selectedCategory?.name,
-      },
-    };
-
+    // Tạo FormData để gửi dữ liệu bao gồm ảnh
     const formData = new FormData();
-    formData.append("product", JSON.stringify(product));
-    if (imageUrl) {
-      formData.append("imageUrl", imageUrl);
-    }
-    moreImages.forEach((image) => {
-      formData.append("images", image);
-    });
-    formData.append("categoryId", categoryId);
-    console.log(formData);
+    formData.append("name", values.name);
+    formData.append("description", values.description);
+    formData.append("price", values.price);
+    formData.append("categoryId", values.categoryId);
+    formData.append("imageUrl", imageUrl);
+    // if (imageUrl && imageUrl instanceof File) {
+    //   formData.append('imageUrl', imageUrl);
+    // } else {
+    //   message.error('Please select a valid image.');
+    //   return;
+    // }
 
+    // Gửi request đến API để tạo sản phẩm mới
     const response = await axios.post(
-      "http://localhost:8099/api/products",
+      "http://localhost:82/php_lab/api/products",
       formData,
       {
         headers: {
@@ -89,75 +86,55 @@ export const createProduct = async (
       }
     );
 
-    if (response.status === 200) {
+    if (response.status === 201) {
+      // Kiểm tra mã trạng thái thành công (201)
       message.success("Product created successfully");
-      form.resetFields();
-      setImageUrl(null);
-      setMoreImages([]);
-      navigate("/admin/products");
-    } else {
-      message.error("Failed to create product");
+      navigate("/admin/products"); // Chuyển hướng đến danh sách sản phẩm
     }
   } catch (error) {
-    console.log("Error creating product:", error);
-    message.error("Failed to create product");
+    console.error("Error creating product:", error);
+    message.error("Error creating product. Please try again.");
   }
 };
+
 export const updateProduct = async (
   id,
-  values,
-  imageUrl,
-  moreImages,
+  payload,
   navigate,
+  setImageUrl,
   setLoading,
-  message,
-  categories
+  message
 ) => {
+  setLoading(true);
   try {
-    setLoading(true);
-    const { categoryId, ...restValues } = values;
-    const selectedCategory = categories.find(
-      (category) => category.id === categoryId
+    const response = await axios.put(
+      `http://localhost:82/php_lab/api/products/${id}`,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
-    const product = {
-      ...restValues,
-      category: {
-        id: categoryId,
-        name: selectedCategory?.name,
-      },
-    };
-
-    const formData = new FormData();
-    formData.append("product", JSON.stringify(product));
-    if (imageUrl instanceof File) {
-      formData.append("imageUrl", imageUrl);
+    if (response.status === 200 || response.status === 201) {
+      message.success("Product updated successfully");
+      navigate("/admin/products");
     }
-    moreImages.forEach((image) => {
-      formData.append("moreImages", image);
-    });
-    formData.append("categoryId", categoryId);
-
-    await axios.put(`http://localhost:8099/api/products/${id}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    message.success("Product updated successfully");
-    navigate("/admin/products"); // Redirect to product list after update
+    return response.data;
   } catch (error) {
-    console.error("Error updating product:", error);
-    message.error("Failed to update product");
-  } finally {
-    setLoading(false);
+    console.error("Error:", error.response || error.message);
+    const errorMessage =
+      error.response?.data?.message || "Failed to update product";
+    message.error("Error: " + errorMessage);
   }
 };
 export const getProductById = async (id) => {
   try {
     const response = await axios.get(
-      `http://localhost:8099/api/products/${id}`
+      `http://localhost:82/php_lab/api/products/${id}`
     );
     return response.data;
+    console.log(response); // Trả về dữ liệu sản phẩm
   } catch (error) {
     console.error("Error fetching product:", error);
     throw error;
@@ -167,7 +144,7 @@ export const getProductById = async (id) => {
 export const getProductByCategory = async (category) => {
   try {
     const response = await axios.get(
-      `http://localhost:8099/api/products?category=${category}`
+      `http://localhost:82/php_lab/api/products?category=${category}`
     );
     return response.data;
   } catch (error) {

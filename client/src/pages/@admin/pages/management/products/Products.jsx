@@ -1,14 +1,18 @@
+import  "./products.scss";
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Table, Button, Space } from 'antd';
 import DeleteModal from '../../../components/DeleteConfirm';
+import { fetchCategories } from "../../../../../services/CategoryController";
 import { deleteProduct, fetchProducts } from '../../../../../services/ProductController';
 const Products = () => {
     const [products, setProducts] = useState([]);
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [IdproductDelete, setProducIdToDelete] = useState(null);
-
+    const [categories, setCategories] = useState([]);
+    
     useEffect(() => {
         fetchProducts(setProducts);
     }, []);
@@ -36,21 +40,25 @@ const Products = () => {
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: 'Name', dataIndex: 'name', key: 'name' },
         { title: 'Description', dataIndex: 'description', key: 'description' },
-        { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
         {
             title: 'Image',
             dataIndex: 'imageUrl',
             key: 'imageUrl',
             render: (text, record) => (
+                // Tạo URL đầy đủ từ đường dẫn ảnh và hiển thị ảnh trong <img>
                 <img
-                    src={`http://localhost:8099${record.imageUrl}`}
-                    alt={record.name}
-                    style={{ width: '50px', height: '50px' }}
+                  src={`http://localhost:82/php_lab/${record.imageUrl}`}  // Kết hợp URL gốc với đường dẫn ảnh từ backend
+                  alt={record.name}
+                  style={{ width: '50px', height: '50px' }}
                 />
-            )
+              ),
         },
         { title: 'Price', dataIndex: 'price', key: 'price' },
-        { title: 'Category', dataIndex: ['category', 'name'], key: 'category' },
+        {
+            title: 'Category',
+            key: 'category_name',
+            render: (category) => category.category_name || "No Category"
+        },
         {
             title: 'Action',
             key: 'action',
@@ -62,6 +70,7 @@ const Products = () => {
             ),
         },
     ];
+    console.log(products);
 
     return (
         <div>

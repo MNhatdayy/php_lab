@@ -106,7 +106,7 @@ function App() {
       <div className="full">
         <Router>
           <Routes>
-            {role === "admin" && (
+            {role === "ADMIN" && (
               <Route path="/admin/*" element={<LayoutAdmin />}>
                 <Route index element={<Dashboard />} />
                 <Route path="" element={<Dashboard />} />

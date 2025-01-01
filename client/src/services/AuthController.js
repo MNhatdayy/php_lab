@@ -2,11 +2,13 @@ import { getAuthToken, request, setAuthToken } from "../util/ApiFunction";
 import { jwtDecode } from "jwt-decode";
 
 export const login = async function (email, password) {
+  
   const respone = await request("POST", "/auth/login", {
     email,
     password,
   });
   if (respone.status === 200) {
+    console.log(respone.data);
     setAuthToken(respone.data.token);
     return respone.data.token;
   } else {

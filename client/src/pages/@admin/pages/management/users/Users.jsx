@@ -39,9 +39,9 @@ const handleCancel = () => {
       key: 'id',
     },
     {
-      title: 'Username',
-      dataIndex: 'username',
-      key: 'username',
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Email',
