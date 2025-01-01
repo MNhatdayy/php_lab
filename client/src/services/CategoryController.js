@@ -2,7 +2,7 @@ import axios from "axios";
 import { notification } from "antd";
 export const fetchCategories = async (setCategories) => {
   try {
-    const response = await axios.get("http://localhost:8099/api/categories");
+    const response = await axios.get("http://localhost:82/php_lab/api/categories");
     setCategories(response.data);
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -10,7 +10,7 @@ export const fetchCategories = async (setCategories) => {
 };
 export const deleteCategory = async (id, categories, setCategories) => {
   try {
-    await axios.delete(`http://localhost:8099/api/categories/${id}`);
+    await axios.delete(`http://localhost:82/php_lab/api/categories/${id}`);
     setCategories(categories.filter((category) => category.id !== id));
     notification.success({
       message: "Delete Success",
@@ -23,7 +23,7 @@ export const deleteCategory = async (id, categories, setCategories) => {
 export const fetchCategoryById = async (id, form) => {
   try {
     const response = await axios.get(
-      `http://localhost:8099/api/categories/${id}`
+      `http://localhost:82/php_lab/api/categories/${id}`
     );
     form.setFieldsValue(response.data);
   } catch (error) {
@@ -37,7 +37,7 @@ export const fetchCategoryById = async (id, form) => {
 export const updateCategory = async (id, values, setLoading) => {
   setLoading(true);
   try {
-    await axios.put(`http://localhost:8099/api/categories/${id}`, values);
+    await axios.put(`http://localhost:82/php_lab/api/categories/${id}`, values);
     notification.success({
       message: "Success",
       description: "Category updated successfully.",
@@ -54,7 +54,7 @@ export const updateCategory = async (id, values, setLoading) => {
 };
 export const createCategory = async (values, navigate) => {
   try {
-    await axios.post("http://localhost:8099/api/categories/create", values);
+    await axios.post("http://localhost:82/php_lab/api/categories", values);
     navigate("/admin/categories");
     notification.success({
       message: "Success",

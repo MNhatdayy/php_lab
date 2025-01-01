@@ -25,6 +25,13 @@ const CreateCategory = () => {
       >
         <Input />
       </Form.Item>
+      <Form.Item
+        name="description"
+        label="Description"
+        rules={[{ required: true, message: 'Please input the category description!' }]}
+      >
+        <Input />
+      </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">
           Create Category

@@ -22,11 +22,26 @@ require_once 'app/helpers/Router.php';
 $router = new Router();
 
 // Định nghĩa các route
+
+$router->add('GET', '/api/users', 'UserApiController@index');
+$router->add('GET', '/api/users/{id}', 'UserApiController@getById');
+$router->add('POST', '/api/users', 'UserApiController@create');
+$router->add('PUT', '/api/users/{id}', 'UserApiController@update');
+$router->add('DELETE', '/api/users/{id}', 'UserApiController@delete');
+
 $router->add('GET', '/api/products', 'ProductApiController@index');
-$router->add('GET', '/api/products/{id}', 'ProductApiController@show');
+$router->add('GET', '/api/products/{id}', 'ProductApiController@getById');
 $router->add('POST', '/api/products', 'ProductApiController@create');
 $router->add('PUT', '/api/products/{id}', 'ProductApiController@update');
-$router->add('DELETE', '/api/products/{id}', 'ProductApiController@destroy');
+$router->add('DELETE', '/api/products/{id}', 'ProductApiController@delete');
+
+
+$router->add('GET', '/api/categories', 'CategoryApiController@index');
+$router->add('GET', '/api/categories/{id}', 'CategoryApiController@getById');
+$router->add('POST', '/api/categories', 'CategoryApiController@create');
+$router->add('PUT', '/api/categories/{id}', 'CategoryApiController@update');
+$router->add('DELETE', '/api/categories/{id}', 'CategoryApiController@delete');
+
 
 $router->add('POST', '/api/auth/register', 'AuthApiController@register');
 $router->add('POST', '/api/auth/login', 'AuthApiController@login');
