@@ -2,7 +2,7 @@
 require_once('app/config/database.php');
 require_once('app/models/ProductModel.php');
 require_once('app/utils/JWTHandler.php');
-
+require_once 'app/helpers/UploadService.php';
 class ProductApiController
 {
     private $productModel;
@@ -49,8 +49,8 @@ class ProductApiController
     public function create()
     {
         $this->setCorsHeaders();
-        header('Content-Type: application/json');
-        // $data = json_decode(file_get_contents('php://input'), true);
+        header('Content-Type: multipart/form-data');
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['imageUrl'])) {
             // Lấy dữ liệu từ $_POST và $_FILES
             $name = $_POST['name'] ?? '';
@@ -68,8 +68,11 @@ class ProductApiController
             }
 
             // Xử lý upload ảnh
+
+            $uploadService = new UploadService();
+
             try {
-                $imageUrl = $this->productModel->processImage($image);
+                $imageUrl = $uploadService->uploadImage($image); // Lưu ảnh vào thư mục uploads
             } catch (Exception $e) {
                 http_response_code(400);
                 echo json_encode(['message' => 'Error processing image: ' . $e->getMessage()]);
@@ -89,11 +92,12 @@ class ProductApiController
             echo json_encode(['message' => 'No form data received']);
         }
     }
+
     public function update($id)
     {
-        
+
         $this->setCorsHeaders();
-        header('Content-Type: application/json');
+        header('Content-Type: multipart/form-data');
 
         $product = $this->productModel->getProductById($id);
         if (!$product) {
@@ -101,7 +105,7 @@ class ProductApiController
             echo json_encode(['message' => 'Product not found.']);
             return;
         }
-        
+
         // Kiểm tra có file upload không
         $image = $_FILES['imageUrl'] ?? null;
 
@@ -113,16 +117,17 @@ class ProductApiController
             echo json_encode(['message' => 'Invalid request: No data provided.']);
             return;
         }
+        $name = $_PUT['name'] ?? '';
+        $description = $_PUT['description'] ?? '';
+        $price = $_PUT['price'] ?? '';
+        $category_id = $_PUT['categoryId'] ?? null;
+        $image = $_FILES['imageUrl'];
 
-        // Lấy dữ liệu từ JSON payload
-        $name = $data['name'] ?? '';
-        $description = $data['description'] ?? '';
-        $price = $data['price'] ?? '';
-        $category_id = $data['category_id'] ?? null;
-       
+
+        $uploadService = new UploadService();
 
         try {
-            $imageUrl = $this->productModel->processImage($image);
+            $imageUrl = $uploadService->uploadImage($image); // Lưu ảnh vào thư mục uploads
         } catch (Exception $e) {
             http_response_code(400);
             echo json_encode(['message' => 'Error processing image: ' . $e->getMessage()]);
@@ -144,7 +149,7 @@ class ProductApiController
             echo json_encode(['message' => 'Error: ' . $e->getMessage()]);
         }
     }
-    
+
     // Xóa sản phẩm theo ID
     public function delete($id)
     {

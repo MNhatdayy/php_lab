@@ -106,31 +106,32 @@ function App() {
       <div className="full">
         <Router>
           <Routes>
-            {role === "ADMIN" && (
-              <Route path="/admin/*" element={<LayoutAdmin />}>
-                <Route index element={<Dashboard />} />
-                <Route path="" element={<Dashboard />} />
+            {role === "ADMIN" ||
+              (role === "admin" && (
+                <Route path="/admin/*" element={<LayoutAdmin />}>
+                  <Route index element={<Dashboard />} />
+                  <Route path="" element={<Dashboard />} />
 
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="user" element={<User />} />
-                <Route path="products">
-                  <Route path="" element={<Products />} />
-                  <Route path="create" element={<CreateProduct />} />
-                  <Route path="update/:id" element={<UpdateProduct />} />
-                </Route>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="user" element={<User />} />
+                  <Route path="products">
+                    <Route path="" element={<Products />} />
+                    <Route path="create" element={<CreateProduct />} />
+                    <Route path="update/:id" element={<UpdateProduct />} />
+                  </Route>
 
-                <Route path="categories">
-                  <Route path="" element={<Categories />} />
-                  <Route path="create" element={<CreateCategory />} />
-                  <Route path="update/:id" element={<UpdateCategory />} />
-                </Route>
+                  <Route path="categories">
+                    <Route path="" element={<Categories />} />
+                    <Route path="create" element={<CreateCategory />} />
+                    <Route path="update/:id" element={<UpdateCategory />} />
+                  </Route>
 
-                <Route path="orders">
-                  <Route path="" element={<Orders />} />
-                  <Route path="detail/:id" element={<OrderDetail />} />
+                  <Route path="orders">
+                    <Route path="" element={<Orders />} />
+                    <Route path="detail/:id" element={<OrderDetail />} />
+                  </Route>
                 </Route>
-              </Route>
-            )}
+              ))}
             <Route path="/shop/*" element={<LayoutShop />}>
               <Route index element={<HomePage />} />
               <Route path="" element={<HomePage />} />

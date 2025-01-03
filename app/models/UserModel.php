@@ -65,7 +65,17 @@ class UserModel
         }
         return false;
     }
+    public function getUserByUsername($username)
+    {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE name = :username LIMIT 1";
 
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':username', $username);
+
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC); // Trả về mảng thông tin người dùng hoặc null nếu không tìm thấy
+    }
     public function updateUser($id, $name, $email, $password, $phone, $role)
     {
         if (!is_numeric($id)) {

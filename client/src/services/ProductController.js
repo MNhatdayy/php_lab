@@ -4,7 +4,7 @@ import { notification } from "antd";
 export const fetchProducts = async (setProducts) => {
   try {
     const response = await axios.get(
-      "http://localhost:82/php_lab/api/products"
+      "http://localhost/php/php_lab/api/products"
     );
     setProducts(response.data);
   } catch (error) {
@@ -13,7 +13,7 @@ export const fetchProducts = async (setProducts) => {
 };
 export const deleteProduct = async (id, setProducts, products) => {
   try {
-    await axios.delete(`http://localhost:82/php_lab/api/products/${id}`);
+    await axios.delete(`http://localhost/php/php_lab/api/products/${id}`);
     setProducts(products.filter((product) => product.id !== id));
     notification.success({
       message: "Delete Success",
@@ -35,14 +35,14 @@ export const fetchProductDetails = async (
 ) => {
   try {
     const response = await axios.get(
-      `http://localhost:82/php_lab/api/products/${id}`
+      `http://localhost/php/php_lab/api/products/${id}`
     );
     const product = response.data;
     form.setFieldsValue(response.data, { categoryId: product.categoryId });
     setImageUrl(product.imageUrl);
     if (!setCategories || setCategories.length === 0) {
       const categoriesResponse = await axios.get(
-        "http://localhost:82/php_lab/api/categories"
+        "http://localhost/php/php_lab/api/categories"
       );
       setCategories(categoriesResponse.data); // Set categories if needed
     }
@@ -57,8 +57,7 @@ export const createProduct = async (
   navigate,
   form,
   setImageUrl,
-  message,
-  categories
+  message
 ) => {
   try {
     // Tạo FormData để gửi dữ liệu bao gồm ảnh
@@ -77,7 +76,7 @@ export const createProduct = async (
 
     // Gửi request đến API để tạo sản phẩm mới
     const response = await axios.post(
-      "http://localhost:82/php_lab/api/products",
+      "http://localhost/php/php_lab/api/products",
       formData,
       {
         headers: {
@@ -100,6 +99,7 @@ export const createProduct = async (
 export const updateProduct = async (
   id,
   payload,
+  imageUrl,
   navigate,
   setImageUrl,
   setLoading,
@@ -107,12 +107,18 @@ export const updateProduct = async (
 ) => {
   setLoading(true);
   try {
+    const formData = new FormData();
+    formData.append("name", payload.name);
+    formData.append("description", payload.description);
+    formData.append("price", payload.price);
+    formData.append("categoryId", payload.categoryId);
+    formData.append("imageUrl", imageUrl);
     const response = await axios.put(
-      `http://localhost:82/php_lab/api/products/${id}`,
-      payload,
+      `http://localhost/php/php_lab/api/products/${id}`,
+      formData,
       {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       }
     );
@@ -131,10 +137,9 @@ export const updateProduct = async (
 export const getProductById = async (id) => {
   try {
     const response = await axios.get(
-      `http://localhost:82/php_lab/api/products/${id}`
+      `http://localhost/php/php_lab/api/products/${id}`
     );
     return response.data;
-    console.log(response); // Trả về dữ liệu sản phẩm
   } catch (error) {
     console.error("Error fetching product:", error);
     throw error;
@@ -144,7 +149,7 @@ export const getProductById = async (id) => {
 export const getProductByCategory = async (category) => {
   try {
     const response = await axios.get(
-      `http://localhost:82/php_lab/api/products?category=${category}`
+      `http://localhost/php/php_lab/api/products?category=${category}`
     );
     return response.data;
   } catch (error) {

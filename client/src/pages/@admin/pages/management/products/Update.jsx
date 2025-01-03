@@ -8,7 +8,7 @@ import {
 import { fetchCategories } from "../../../../../services/CategoryController";
 
 const { Option } = Select;
-
+const baseURL = "http://localhost/php/php_lab/";
 const UpdateProduct = () => {
   const [form] = Form.useForm();
   const { id } = useParams();
@@ -22,53 +22,35 @@ const UpdateProduct = () => {
   }, []);
 
   useEffect(() => {
-    fetchProductDetails(id, form, setImageUrl, setCategories); // Lấy thông tin chi tiết sản phẩm
+    fetchProductDetails(id, form, setImageUrl, setCategories);
   }, [id, form]);
 
   const onFinish = async (values) => {
-    if (!imageUrl && !imageFile) {
+    if (!imageUrl) {
       message.error("Please upload the main image.");
       return;
     }
-
-    let price = parseFloat(values.price);
-    if (isNaN(price) || price <= 0) {
-      message.error("Invalid price value");
-      return;
-    }
-
-    price = price.toFixed(2);
-
-    const payload = {
-      ...values,
-      price,
-      imageUrl: imageUrl.name, // Gửi tên file
-    };
-    console.log("Form values:",payload);
     updateProduct(
-      id,
-      payload,
+      values,
+      imageUrl,
       navigate,
+      form,
       setImageUrl,
-      setLoading,
-      message
+      message,
+      categories
     );
   };
-  
 
   const handleImageUpload = (info) => {
-		const file = info.file;
-		const allowedTypes = ["image/jpeg", "image/png"];
-		if (file && allowedTypes.includes(file.type)) {
-		  setImageUrl({
-        name: file.name, // lưu tên file
-      });
-		  message.success(`${file.name} selected successfully`);
-		  console.log('Image URL:', file);
-		} else {
-		  message.error("Invalid file type. Only JPEG and PNG are allowed.");
-		}
-	  };
+    const file = info.file;
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (file && allowedTypes.includes(file.type)) {
+      setImageUrl(file.name);
+      message.success(`${file.name} selected successfully`);
+    } else {
+      message.error("Invalid file type. Only JPEG and PNG are allowed.");
+    }
+  };
 
   return (
     <Form form={form} layout="vertical" onFinish={onFinish}>
@@ -79,7 +61,6 @@ const UpdateProduct = () => {
       >
         <Input />
       </Form.Item>
-
       <Form.Item
         name="description"
         label="Description"
@@ -89,7 +70,6 @@ const UpdateProduct = () => {
       >
         <Input.TextArea rows={4} />
       </Form.Item>
-
       <Form.Item
         name="price"
         label="Price"
@@ -97,7 +77,6 @@ const UpdateProduct = () => {
       >
         <Input type="number" min="0.01" step="0.01" />
       </Form.Item>
-
       <Form.Item
         name="category_id"
         label="Category"
@@ -117,20 +96,26 @@ const UpdateProduct = () => {
       </Form.Item>
 
       <Form.Item label="Main Image">
-					<Upload.Dragger
-						name="imageUrl"
-						listType="picture"
-						multiple={false}
-						onChange={handleImageUpload}
-						beforeUpload={() => false}>
-						<p className="ant-upload-drag-icon">
-							Drag & drop an image here or click to select
-						</p>
-					</Upload.Dragger>
-				</Form.Item>
-
+        <Upload.Dragger
+          name="imageUrl"
+          listType="picture"
+          multiple={false}
+          onChange={handleImageUpload}
+          beforeUpload={() => false}
+        >
+          {imageUrl ? (
+            <img
+              src={`${baseURL}${imageUrl}`}
+              alt="current"
+              style={{ width: "100px", height: "100px" }}
+            />
+          ) : (
+            <p className="ant-upload-drag-icon">Hãy bấm vào đây để thêm ảnh</p>
+          )}
+        </Upload.Dragger>
+      </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
+        <Button type="primary" htmlType="sub  mit" loading={loading}>
           Update Product
         </Button>
       </Form.Item>
